@@ -24,6 +24,14 @@ class HomeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $parentId = $form->get("parentId")->getData();
+
+            if($parentId != null){
+                $parent = $entityManager->getRepository(Comment::class)->find($parentId);
+            }
+
+            $comment->setParent($parent ?? null);
+
             $entityManager->persist($comment);
             $entityManager->flush();
 

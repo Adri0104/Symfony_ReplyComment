@@ -30,7 +30,7 @@
     </nav>
     <main class="container">
         <div class="bg-body-tertiary p-5 rounded">
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'data-bs-target': 'add-comment'}}) }}
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label">Nom</label>
                     {{ form_widget(form.name) }}
@@ -45,18 +45,51 @@
             {{ form_end(form) }}
 
             {% for c in comments %}
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Nom : {{ c.name }}</h5>
-                                <p class="card-text">Commentaire : {{ c.content }}</p>
-                                <a href="#" class="btn btn-primary">Répondre</a>
+                {% if c.parent == null %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Nom : {{ c.name }}</h5>
+                                    <p class="card-text">Commentaire : {{ c.content }}</p>
+                                    <a href="#add-comment" data-reply data-id="{{ c.id }}" class="btn btn-primary">Répondre</a>
+                                </div>
                             </div>
+                            {% for reply in c.replies %}
+                                <div class="card ms-5">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Nom : {{ reply.name }}</h5>
+                                        <p class="card-text">Commentaire : {{ reply.content }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
     </main>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     document.querySelectorAll('[data-reply]').forEach(function (reply) {
+        //         reply.addEventListener('click', function (e) {
+        //             e.preventDefault();
+        //             const id = e.target.getAttribute('data-id');
+        //             const form = document.querySelector('form');
+        //             form.querySelector('input[name="parent"]').value = id;
+        //             form.scrollIntoView({behavior: 'smooth'});
+        //         });
+        //     });
+        // });
+        window.onload = () => {
+            document.querySelectorAll("[data-reply]").forEach(element => {
+                element.addEventListener("click", function(){
+                    document.querySelector("#comment_parentId").value = this.dataset.id;
+                });
+            });
+        }
+    </script>
 {% endblock %}
